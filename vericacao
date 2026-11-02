@@ -1,0 +1,17 @@
+ const signature = req.get('X-Signature-Ed25519');
+ const timestamp = req.get('X-Signature-Timestamp');
+ const isValidRequest = await verifyKey(req.rawBody, signature, timestamp, 'MY_CLIENT_PUBLIC_KEY');
+ if (!isValidRequest) {
+   return res.status(401).end('Bad request signature');
+ }
+app.post('/interactions', verifyKeyMiddleware('MY_CLIENT_PUBLIC_KEY'), (req, res) => {
+  const message = req.body;
+  if (message.type === InteractionType.APPLICATION_COMMAND) {
+    res.send({
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: 'Hello world',
+      },
+    });
+  }
+});
